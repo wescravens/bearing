@@ -4,7 +4,7 @@
 //     Bearing may be freely distributed under the MIT license.
 //     Bearing Views are an adaptation of Backbone Views but are not dependent on Underscore
 //     For more details and documentation:
-//     website here
+//     https://github.com/wescravens/bearing
 
 (function(root, factory) {
 
