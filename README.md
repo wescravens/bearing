@@ -31,17 +31,18 @@ var view = new View({
 	mySomething: 'somedata'
 });
 ```
-Bearing uses identical syntax to Backbone Views, thought behind the scenes, a few things have changed.
+Bearing uses identical syntax to Backbone Views, though behind the scenes, a few things have changed.
 The key differences are the use of jQuery for event delegation and the removal of the Underscore dependency.
-The key use for Bearing is to be used to create modular JavaScript that only interacts within its DOM scope, and to have a simple way to manage events.
+The key use for Bearing is to create modular JavaScript that only interacts within its DOM scope, and to have a simple way to manage events.
 
-Bearing also will allow you to declare any variables you want when creating the view instance.  They will be accessible within ```this```.
+Bearing also will allow you to declare any variables you want when creating the view instance.  They will be accessible via ```this```.
 
 ###Event History
 
-Bearing also includes an an event history option which can be turned on as demonstrated above.  This will store every event triggered within the view in ```this.eventHistory```.  The entire jQuery event object gets stored along with some data from the view such as the method called.
-This is accessible via ```data``` within the event object.  The Bearing events will always pass in the event object in the parameters of the method called.
-Aside from the Event History, all active event listeners are stored in the ```this.listeningTo```.
+Bearing also includes an an event history option which can be turned on as demonstrated above.  This will store every event triggered within the view in ```this.eventHistory```.
+The entire jQuery event object gets stored along with some data from the view such as the method called.
+This is accessible via ```data``` within the event object.  Bearing events will always pass in the event object in the parameters of the method called.
+All active event listeners are stored in the ```this.listeningTo```.
 
 ###Feature Documentation
 
