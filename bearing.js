@@ -242,6 +242,26 @@
 	// loads initializes views based on data-load on the rool el
 	var loader = Bearing.Loader = (function(loader) {
 
+		/**
+		 * Utility function used to flatten nested arrays
+		 * @private
+		 * @param  {Array} arr Array to be flattened
+		 * @return {Array} Flattened Array
+		 */
+		function flatten(arr) {
+			var flattened = [];
+			(function flattener(a) {
+				if ( typeof a.length !== "undefined" ) {
+					for ( var i = 0; i < a.length; i++ ) {
+						flattener(a[i]);
+					}
+				} else {
+					flattened.push(a);
+				}
+			})(arr)
+			return flattened;
+		}
+
 		loader.load = function() {
 			var $bearingEls = $('[data-use]'),
 				_this = this;
