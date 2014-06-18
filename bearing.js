@@ -16,6 +16,13 @@
 	// Create an instance of '$' under the Bearing namespace
 	Bearing.$ = $;
 
+	// Create an object to store global Bearing options
+	Bearing.options = {};
+
+	// Create the a namespace to store views in
+	Bearing.Views = {};
+	var namespace = Bearing.options.namespace || Bearing.Views;
+
 	// Cache common Array prototype functions
 	var ArrayProto = Array.prototype,
 		ObjectProto = Object.prototype;
@@ -80,7 +87,10 @@
 	assign(
 		View.prototype,
 		{
-			// Limit DOM traversion to the View's root element
+			// Set the default view name to null
+			name: null,
+
+			// Limit DOM traversion to the View's root element via this.$
 			$: function(selector) {
 				return this.$el.find(selector);
 			},
@@ -138,9 +148,9 @@
 					// the element the event is attached to, so $.proxy() is
 					// used to retain the View scope within the function
 					if ( selector === '' ) {
-						this.$el.on(eventName, eventData, $.proxy(callback, this));
+						this.$el.on(eventName, eventData, Bearing.$.proxy(callback, this));
 					} else {
-						this.$el.on(eventName, selector, eventData, $.proxy(callback, this));
+						this.$el.on(eventName, selector, eventData, Bearing.$.proxy(callback, this));
 					}
 				}
 			},
@@ -183,10 +193,14 @@
 			// If it's a string, it gets wrapped by jQuery first
 			// TODO: optimize this by element type
 			_appropriateElement: function() {
+				if ( !this.el ) {
+					throw new Error('An DOM element must be assigned to view ' + this.id + ' via the "el" property.');
+				}
 				if ( typeof this.el === 'string' ) {
 					this.$el = Bearing.$(this.el);
 				} else {
 					this.$el = this.el;
+					this.el = this.el[0];
 				}
 			}
 		}
@@ -224,6 +238,36 @@
 
 	// Give View the extend function
 	View.extend = extend;
+
+	// loads initializes views based on data-load on the rool el
+	var loader = Bearing.Loader = (function(loader) {
+
+		loader.load = function() {
+			var $bearingEls = $('[data-use]'),
+				_this = this;
+
+			if ( !$bearingEls.length ) { return; }
+
+			// Create an array of objects that store the function name and root DOM node of the feature ($.map())
+			// Flatten the nested arrays created by splitting the data-features string (flatten())
+			// Loop through the array created by $.map. Setup and initialize the features ($.each())
+			_.each(_.flatten(_.map($bearingEls, function(element) {
+				var funcArray = $(element).data('use').split(/\s*[\s,]\s*/);
+				return $.map(funcArray, function(func) {
+					return { func: func, element: element };
+				});
+			})), function(feature) {
+				new _this[feature.func]({ el: $(feature.element) }).deliver();
+			});
+		};
+
+		return loader;
+
+	})({});
+
+	$(document).ready(function() {
+		loader.load();
+	});
 
 	return Bearing;
 }));

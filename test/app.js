@@ -1,9 +1,10 @@
 /* global $, Bearing */
 window.App = {};
-App.Views = {};
-var TestView = Bearing.View.extend({
+App.Views = Bearing.Loader;
+App.Views.TestView = Bearing.View.extend({
+	enableHistory: true,
 	setup: function() {
-		// Do stuff when the View is created
+		// do stuff when the view is created
 	},
 	events: {
 		'click .btn': 'deliver',
@@ -18,8 +19,8 @@ var TestView = Bearing.View.extend({
 		if ( this.i > 1 ) {
 			text = 'times';
 		}
+		console.log('this', this);
 		this.$el.html('<h1>This is View ' + this.id + '</h1><p>It has been rendered ' + this.i + ' ' + text + '.</p><button class="btn">Click Me</button><button class="stop-btn">Stop Listening</button><button class="show-clicks">Show Clicks</button><button class="clear-dots">Clear Clicks</button>');
-		console.log(this.$el);
 		this.i++;
 	},
 	x: 0,
@@ -44,9 +45,3 @@ var TestView = Bearing.View.extend({
 		this.$el.find('.click').remove();
 	}
 });
-
-App.Views.testView = new TestView({
-	el: '.morecontent',
-	enableHistory: true
-});
-App.Views.testView.deliver();
