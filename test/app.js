@@ -1,7 +1,9 @@
 /* global $, Bearing */
 window.App = {};
-App.Views = Bearing.Loader;
-App.Views.TestView = Bearing.View.extend({
+
+App.Views = Bearing.Views;
+
+Bearing.createClass('TestView', {
 	enableHistory: true,
 	setup: function() {
 		// do stuff when the view is created

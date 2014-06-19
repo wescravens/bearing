@@ -8,8 +8,22 @@
 
 (function(root, factory) {
 
-	// Create global Bearing and solve '$' conflicts
-	root.Bearing = factory(root, {}, (root.jQuery || root.$));
+	// AMD support
+	if ( typeof define === 'function' && define.amd ) {
+		define(['underscore', 'jquery', 'exports'], function(_, $, exports) {
+			return factory(root, exports, _, $);
+		});
+	}
+
+	// Node Support
+	else if (typeof exports !== 'undefined') {
+	    var $ = require('jquery');
+	    factory(root, exports, $);
+
+	// Expose Global
+	else {
+		root.Bearing = factory(root, {}, (root.jQuery || root.$));
+	}
 
 }(this, function(root, Bearing, $) {
 
@@ -20,7 +34,7 @@
 	Bearing.options = {};
 
 	// Create the a namespace to store views in
-	Bearing.Views = {};
+	var views = Bearing.Views = {};
 	var namespace = Bearing.options.namespace || Bearing.Views;
 
 	// Cache common Array prototype functions
@@ -206,34 +220,46 @@
 		}
 	);
 
+	var classes = {};
+
+	var createClass = Bearing.createClass = function(name, options) {
+		if ( !name ) { throw new Error('Cannot create class with name of ' + name) }
+		options = options || {};
+
+		classes[name] = View.extend(options);
+
+	};
+
 	// Based on Backbone's *extend* function
 	// Adapted for use without Underscore
 	var extend = function(proto, props) {
 		var origin = this;
-		var child;
+		var BearingView;
 
 		if ( proto && proto.hasOwnProperty('constructor') ) {
-			child = proto.constructor;
+			BearingView = proto.constructor;
 		} else {
-			child = function() {
+			BearingView = function() {
 				return origin.apply(this, arguments);
 			};
 		}
 
 		// Add specified properties to the constructor
-		assign(child, origin, props);
+		assign(BearingView, origin, props);
 
 		// Set the prototype chain to inherit from `origin`, without calling
 		// `origin`'s constructor function.
-		var Tmp = function(){ this.constructor = child; };
-		Tmp.prototype = origin.prototype;
-		child.prototype = new Tmp();
+		var Surrogate = function(){ this.constructor = BearingView; };
+		Surrogate.prototype = origin.prototype;
+		BearingView.prototype = new Surrogate();
 
 		// Add prototype properties (instance properties) to the subclass,
 		// if supplied.
-		if (proto) assign(child.prototype, proto);
+		if (proto) assign(BearingView.prototype, proto);
 
-		return child;
+		BearingView.prototype.__super__ = origin.prototype;
+
+		return BearingView;
 	};
 
 	// Give View the extend function
@@ -271,13 +297,14 @@
 			// Create an array of objects that store the function name and root DOM node of the feature ($.map())
 			// Flatten the nested arrays created by splitting the data-features string (flatten())
 			// Loop through the array created by $.map. Setup and initialize the features ($.each())
-			_.each(_.flatten(_.map($bearingEls, function(element) {
+			$.each(flatten($.map($bearingEls, function(element) {
 				var funcArray = $(element).data('use').split(/\s*[\s,]\s*/);
 				return $.map(funcArray, function(func) {
 					return { func: func, element: element };
 				});
-			})), function(feature) {
-				new _this[feature.func]({ el: $(feature.element) }).deliver();
+			})), function() {
+				views[this.func] = new classes[this.func]({ el: $(this.element) });
+				views[this.func].deliver();
 			});
 		};
 
