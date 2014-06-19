@@ -266,7 +266,7 @@
 	// Give View the extend function
 	View.extend = extend;
 
-	// loads initializes views based on data-load on the rool el
+	// Delivers views based on data-use on the rool el
 	var loader = Bearing.Loader = (function(loader) {
 
 		/**
