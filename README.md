@@ -10,7 +10,7 @@ bower install bearing
 ###Create your first View
 
 ```
-var View = Bearing.View.extend({
+Bearing.createClass('TestView', {
 	setup: function() {
 		// this will be called when the view instance is created
 	},
@@ -26,18 +26,17 @@ var View = Bearing.View.extend({
 	doSomething: function() {},
 	submitForm: function() {}
 });
-
-var view = new View({
-	el: '.my-element',
-	enableHistory: true,
-	mySomething: 'somedata'
-});
 ```
+
+Bearing uses a ```data-use``` directive to initialize views on DOM ready.
+```
+<div class="my-feature" data-use="TestView"></div>
+```
+
 Bearing uses identical syntax to Backbone Views, though behind the scenes, a few things have changed.
 The key differences are the use of jQuery for event delegation and the removal of the Underscore dependency.
 The key use for Bearing is to create modular JavaScript that only interacts within its DOM scope, and to have a simple way to manage events.
 
-Bearing also will allow you to declare any variables you want when creating the view instance.  They will be accessible via ```this.variableName```.
 
 ###Event History
 

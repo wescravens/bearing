@@ -19,6 +19,7 @@
 	else if (typeof exports !== 'undefined') {
 	    var $ = require('jquery');
 	    factory(root, exports, $);
+	}
 
 	// Expose Global
 	else {
@@ -303,8 +304,10 @@
 					return { func: func, element: element };
 				});
 			})), function() {
-				views[this.func] = new classes[this.func]({ el: $(this.element) });
-				views[this.func].deliver();
+				if ( classes[this.func] && typeof classes[this.func] === 'function' ) {
+					views[this.func] = new classes[this.func]({ el: $(this.element) });
+					views[this.func].deliver();
+				}
 			});
 		};
 
