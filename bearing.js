@@ -10,8 +10,8 @@
 
 	// AMD support
 	if ( typeof define === 'function' && define.amd ) {
-		define(['underscore', 'jquery', 'exports'], function(_, $, exports) {
-			return factory(root, exports, _, $);
+		define(['jquery', 'exports'], function($, exports) {
+			return factory(root, exports, $);
 		});
 	}
 
@@ -279,8 +279,10 @@
 			var flattened = [];
 			(function flattener(a) {
 				if ( typeof a.length !== "undefined" ) {
-					for ( var i = 0; i < a.length; i++ ) {
-						flattener(a[i]);
+					var index = -1,
+						length = a.length;
+					while( ++index < length ) {
+						flattener(a[index]);
 					}
 				} else {
 					flattened.push(a);
@@ -289,24 +291,43 @@
 			return flattened;
 		}
 
+		/**
+		 * Creates an array of objects that store the function name and root DOM node of the feature ($.map())
+		 * Flattenes the nested arrays created by splitting the data-features string (flatten())
+		 * Loops through the array created by $.map(). Setup and initialize the features ($.each())
+		 * @return {undefined} void
+		 */
 		loader.load = function() {
 			var $bearingEls = $('[data-use]'),
 				_this = this;
 
 			if ( !$bearingEls.length ) { return; }
 
-			// Create an array of objects that store the function name and root DOM node of the feature ($.map())
-			// Flatten the nested arrays created by splitting the data-features string (flatten())
-			// Loop through the array created by $.map. Setup and initialize the features ($.each())
-			$.each(flatten($.map($bearingEls, function(element) {
-				var funcArray = $(element).data('use').split(/\s*[\s,]\s*/);
-				return $.map(funcArray, function(func) {
-					return { func: func, element: element };
-				});
-			})), function() {
-				if ( classes[this.func] && typeof classes[this.func] === 'function' ) {
-					views[this.func] = new classes[this.func]({ el: $(this.element) });
-					views[this.func].deliver();
+			var stringSplitter = /\s*[\s,]\s*/;
+
+			// Create an array of objects that store the class name and root DOM node of the feature class
+			var classMap = $bearingEls.map(function() {
+				var element = this,
+					classString = $(element).data('use');
+					classArray = classString.split(stringSplitter),
+					classMap = $.map(classArray, function(className) {
+						return {
+							className: className,
+							element: element
+						};
+					});
+
+				return classMap;
+			});
+
+			// Flatten the nested arrays created by splitting the data-use string
+			classMap = flatten(classMap);
+
+			// Loop through the array created by $.map(). Setup and initialize the features.
+			$.each(classMap, function() {
+				if ( classes[this.className] && typeof classes[this.className] === 'function' ) {
+					views[this.className] = new classes[this.className]({ el: $(this.element) });
+					views[this.className].deliver();
 				}
 			});
 		};
