@@ -292,9 +292,9 @@
 		}
 
 		/**
-		 * Creates an array of objects that store the function name and root DOM node of the feature ($.map())
-		 * Flattenes the nested arrays created by splitting the data-features string (flatten())
-		 * Loops through the array created by $.map(). Setup and initialize the features ($.each())
+		 * Creates an array of objects that store the function name and root DOM node of the feature
+		 * Flattenes the nested arrays created by splitting the data-features string
+		 * Loops through the array created by $.map(). Setup and initialize the features
 		 * @return {undefined} void
 		 */
 		loader.load = function() {
@@ -306,7 +306,7 @@
 			var stringSplitter = /\s*[\s,]\s*/;
 
 			// Create an array of objects that store the class name and root DOM node of the feature class
-			var classMap = $bearingEls.map(function() {
+			var classMaps = $bearingEls.map(function() {
 				var element = this,
 					classString = $(element).data('use');
 					classArray = classString.split(stringSplitter),
@@ -321,15 +321,20 @@
 			});
 
 			// Flatten the nested arrays created by splitting the data-use string
-			classMap = flatten(classMap);
+			classMaps = flatten(classMaps);
+
+			var index = -1,
+				length = classMaps.length;
 
 			// Loop through the array created by $.map(). Setup and initialize the features.
-			$.each(classMap, function() {
-				if ( classes[this.className] && typeof classes[this.className] === 'function' ) {
-					views[this.className] = new classes[this.className]({ el: $(this.element) });
-					views[this.className].deliver();
+			while(++index < length) {
+				var className = classMaps[index].className,
+					rootElement = classMaps[index].element;
+				if ( classes[className] && typeof classes[className] === 'function' ) {
+					views[className] = new classes[className]({ el: $(rootElement) });
+					views[className].deliver();
 				}
-			});
+			}
 		};
 
 		return loader;
