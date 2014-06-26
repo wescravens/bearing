@@ -1,6 +1,6 @@
 {
   "name": "Bearing",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "devDependencies": {
     "grunt-open": "~0.2.2",

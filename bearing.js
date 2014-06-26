@@ -1,4 +1,4 @@
-//     Bearing.js 0.0.1
+//     Bearing.js 0.0.2
 
 //     (c) 2014 Wes Cravens
 //     Bearing may be freely distributed under the MIT license.
